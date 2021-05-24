@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import contactsSelectors from '../redux/contacts/contactsSelectors';
@@ -18,44 +18,77 @@ const styles = {
   },
 };
 
-class ContactsView extends Component {
-  componentDidMount() {
-    this.props.fetchContacts();
-  }
+const ContactsView = () => {
+  const dispatch = useDispatch();
+  const isLoading = useSelector(contactsSelectors.getLoading);
+  const contacts = useSelector(contactsSelectors.getContacts);
 
-  render() {
-    const { contacts, isLoading } = this.props;
+  useEffect(() => {
+    dispatch(contactsOperations.fetchContacts());
+  }, [dispatch]);
 
-    return (
-      <div className="App">
-        <Section title="Phonebook">
-          <Form />
+  return (
+    <div className="App">
+      <Section title="Phonebook">
+        <Form />
+      </Section>
+
+      {contacts.length > 0 ? (
+        <Section title="Contacts">
+          <div style={styles.loaderContainer}>
+            <Filter />
+            {isLoading && <ContactsLoader />}
+          </div>
+          <ContactsList />
         </Section>
+      ) : (
+        <Notification message="Contacts are missing" />
+      )}
+      <ToastContainer />
+    </div>
+  );
+};
 
-        {contacts.length > 0 ? (
-          <Section title="Contacts">
-            <div style={styles.loaderContainer}>
-              <Filter />
-              {isLoading && <ContactsLoader />}
-            </div>
-            <ContactsList />
-          </Section>
-        ) : (
-          <Notification message="Contacts are missing" />
-        )}
-        <ToastContainer />
-      </div>
-    );
-  }
-}
+export default ContactsView;
 
-const mapStateToProps = state => ({
-  contacts: contactsSelectors.getContacts(state),
-  isLoading: contactsSelectors.getLoading(state),
-});
+// class ContactsView extends Component {
+//   componentDidMount() {
+//     this.props.fetchContacts();
+//   }
 
-const mapDispatchToProps = dispatch => ({
-  fetchContacts: () => dispatch(contactsOperations.fetchContacts()),
-});
+//   render() {
+//     const { contacts, isLoading } = this.props;
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContactsView);
+//     return (
+//       <div className="App">
+//         <Section title="Phonebook">
+//           <Form />
+//         </Section>
+
+//         {contacts.length > 0 ? (
+//           <Section title="Contacts">
+//             <div style={styles.loaderContainer}>
+//               <Filter />
+//               {isLoading && <ContactsLoader />}
+//             </div>
+//             <ContactsList />
+//           </Section>
+//         ) : (
+//           <Notification message="Contacts are missing" />
+//         )}
+//         <ToastContainer />
+//       </div>
+//     );
+//   }
+// }
+
+// const mapStateToProps = state => ({
+//   contacts: contactsSelectors.getContacts(state),
+//   isLoading: contactsSelectors.getLoading(state),
+// });
+
+// const mapDispatchToProps = dispatch => ({
+//   fetchContacts: () => dispatch(contactsOperations.fetchContacts()),
+// });
+
+// export default connect(mapStateToProps, mapDispatchToProps)(ContactsView);
