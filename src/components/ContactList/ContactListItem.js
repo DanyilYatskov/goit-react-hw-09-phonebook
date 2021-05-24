@@ -1,15 +1,13 @@
 import React from 'react';
 import styles from './contactListItem.module.scss';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import contactsOperations from '../../redux/contacts/contactsOperations';
 
-const ContactListItem = ({
-  contactName,
-  contactNumber,
-  contactId,
-  onDeleteContact,
-}) => {
+const ContactListItem = ({ contactName, contactNumber, contactId }) => {
+  const dispatch = useDispatch();
+  const onDeleteContact = id => dispatch(contactsOperations.deleteContact(id));
+
   return (
     <li className={styles.item}>
       <p className={styles.text}>
@@ -27,15 +25,16 @@ const ContactListItem = ({
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  onDeleteContact: id => dispatch(contactsOperations.deleteContact(id)),
-});
-
-export default connect(null, mapDispatchToProps)(ContactListItem);
+export default ContactListItem;
 
 ContactListItem.propTypes = {
   contactName: PropTypes.string.isRequired,
   contactNumber: PropTypes.string.isRequired,
   contactId: PropTypes.string.isRequired,
-  onDeleteContact: PropTypes.func,
 };
+
+// const mapDispatchToProps = dispatch => ({
+//   onDeleteContact: id => dispatch(contactsOperations.deleteContact(id)),
+// });
+
+// export default connect(null, mapDispatchToProps)(ContactListItem);

@@ -1,6 +1,6 @@
-import React, { Component, Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 //import { v4 as uuidv4 } from 'uuid';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { authOperations } from './redux/authentication';
 import AppBar from './components/AppBar';
 import Container from './components/Container';
@@ -16,47 +16,88 @@ const LoginView = lazy(() => import('./views/LoginView'));
 const ContactsView = lazy(() => import('./views/ContactsView'));
 const NotFoundView = lazy(() => import('./views/NotFoundView'));
 
-class App extends Component {
-  componentDidMount() {
-    this.props.onGetCurrentUser();
-  }
-  render() {
-    return (
-      <>
-        <AppBar />
-        <Container>
-          <Suspense fallback={<Loader />}>
-            <Switch>
-              <PublicRoute exact path={routes.homePage} component={HomeView} />
-              <PublicRoute
-                path={routes.registerPage}
-                restricted
-                redirectTo={routes.contactsPage}
-                component={RegisterView}
-              />
-              <PublicRoute
-                path={routes.loginPage}
-                restricted
-                redirectTo={routes.contactsPage}
-                component={LoginView}
-              />
-              <PrivateRoute
-                path={routes.contactsPage}
-                redirectTo={routes.loginPage}
-                component={ContactsView}
-              />
-              {/* <Route path={routes.contactsPage} component={ContactsView} /> */}
-              <Route component={NotFoundView} />
-            </Switch>
-          </Suspense>
-        </Container>
-      </>
-    );
-  }
-}
+const App = () => {
+  const dispatch = useDispatch();
 
-const mapDispatchToProps = {
-  onGetCurrentUser: authOperations.getCurrentUser,
+  useEffect(() => {
+    dispatch(authOperations.getCurrentUser());
+  }, [dispatch]);
+
+  return (
+    <>
+      <AppBar />
+      <Container>
+        <Suspense fallback={<Loader />}>
+          <Switch>
+            <PublicRoute exact path={routes.homePage} component={HomeView} />
+            <PublicRoute
+              path={routes.registerPage}
+              restricted
+              redirectTo={routes.contactsPage}
+              component={RegisterView}
+            />
+            <PublicRoute
+              path={routes.loginPage}
+              restricted
+              redirectTo={routes.contactsPage}
+              component={LoginView}
+            />
+            <PrivateRoute
+              path={routes.contactsPage}
+              redirectTo={routes.loginPage}
+              component={ContactsView}
+            />
+            {/* <Route path={routes.contactsPage} component={ContactsView} /> */}
+            <Route component={NotFoundView} />
+          </Switch>
+        </Suspense>
+      </Container>
+    </>
+  );
 };
 
-export default connect(null, mapDispatchToProps)(App);
+export default App;
+// class App extends Component {
+//   componentDidMount() {
+//     this.props.onGetCurrentUser();
+//   }
+//   render() {
+//     return (
+//       <>
+//         <AppBar />
+//         <Container>
+//           <Suspense fallback={<Loader />}>
+//             <Switch>
+//               <PublicRoute exact path={routes.homePage} component={HomeView} />
+//               <PublicRoute
+//                 path={routes.registerPage}
+//                 restricted
+//                 redirectTo={routes.contactsPage}
+//                 component={RegisterView}
+//               />
+//               <PublicRoute
+//                 path={routes.loginPage}
+//                 restricted
+//                 redirectTo={routes.contactsPage}
+//                 component={LoginView}
+//               />
+//               <PrivateRoute
+//                 path={routes.contactsPage}
+//                 redirectTo={routes.loginPage}
+//                 component={ContactsView}
+//               />
+//               {/* <Route path={routes.contactsPage} component={ContactsView} /> */}
+//               <Route component={NotFoundView} />
+//             </Switch>
+//           </Suspense>
+//         </Container>
+//       </>
+//     );
+//   }
+// }
+
+// const mapDispatchToProps = {
+//   onGetCurrentUser: authOperations.getCurrentUser,
+// };
+
+// export default connect(null, mapDispatchToProps)(App);
